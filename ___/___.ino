@@ -1,4 +1,4 @@
-#include <SharpIR.h>
+//#include <SharpIR.h>
 
 #include <SharpIR.h>
 #include <Wire.h>
