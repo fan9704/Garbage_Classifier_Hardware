@@ -9,15 +9,16 @@ const int scale_factor = -417; //比例參數，從校正程式中取得
 
 HX711 scale;
 
-Servo myservo;  // 建立SERVO物件
+Servo myservo;  // 建立SERVO物件(馬達)
 
 
 int IRpin = 0;                                    // analog pin for reading the IR sensor
 float sensorValue, distance;
-
+int num;
 void setup()
 {
   Serial.begin(9600);                             // start the serial port
+  Serial.setTimeout(1000); 
   pinMode(IRpin, INPUT);//set infrared sensor
   
   myservo.attach(9);  // 設定要將伺服馬達接到哪一個PIN腳,set motor
@@ -45,16 +46,19 @@ void loop()
   sensorValue = analogRead(IRpin);
   sensorValue *= 0.0048828125;
   distance = 60.495 * pow(sensorValue,-1.1904);
-
-  Serial.println(distance);
+  
+  Serial.print("distance:");
+  Serial.print(distance);
+  Serial.print("\n");
   Serial.print("weight:");
   Serial.print(scale.get_units(10), 0);
   Serial.print("\n");
   delay(1000);  
 
-  int num;
+
   while(Serial.available()){
       num  = Serial.read();
+      Serial.println(num);
       turn(num);
     }
 }
