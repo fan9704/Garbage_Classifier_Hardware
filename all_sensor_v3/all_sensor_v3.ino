@@ -13,12 +13,11 @@
 const int scale_factor = -417; //比例參數，從校正程式中取得
 HX711 scale;
 
-Servo myservo;  // 建立SERVO物件
-Servo myservo2;                                  // analog pin for reading the IR sensor
+Servo myservo;  //(下) 建立SERVO物件
+Servo myservo2; //(上)                                 // analog pin for reading the IR sensor
 String garbageType,buttonStatei;
 int detectfinish=0,useState=0,islocked=0;
 const int BUTTON_PIN = 10;  // 按鍵的接腳
-const int BUTTON_PIN2 = 13;
 const int LED_PIN =  3;   // LED燈的接腳
 float sensorValue, distance,weight;
 int buttonState = 0;   // 按鈕的狀態
@@ -95,7 +94,6 @@ class ApiController {
       Serial.println(httpCode);
       http.end();      
     }
-    void printResponse();
 };
 class MotorController {
   public:
@@ -157,9 +155,8 @@ bool buttonStatereset(){
 void setup() {
   Serial.begin(115200);
   wifiSetting.connectInternet("ertw", "52695269");  //("STASSID", "STAPSK")                           // start the serial port
-  //pinMode(LED_PIN, OUTPUT);   //設定LED的PIN腳為輸出
-  //pinMode(BUTTON_PIN, INPUT); //設定按鈕的接腳為輸入，因為我們要讀取它的狀態
-  //pinMode(BUTTON_PIN2, INPUT);
+  pinMode(LED_PIN, OUTPUT);   //設定LED的PIN腳為輸出
+  pinMode(BUTTON_PIN, INPUT); //設定按鈕的接腳為輸入，因為我們要讀取它的狀態
   Serial.println("按按鈕以開始使用");
   pinMode(IRpin, INPUT);//set infrared sensor
   Serial.println("按按鈕以開始使用");
@@ -177,22 +174,19 @@ void setup() {
 }
 
 void loop() {
-  //buttonState = digitalRead(BUTTON_PIN); //讀取按鍵的狀態
-  //buttonState2 = digitalRead(BUTTON_PIN);
+  buttonState = digitalRead(BUTTON_PIN); //讀取按鍵的狀態
   if ((WiFi.status() == WL_CONNECTED)) {     //成功接上網路
     if(useState==0){
       Serial.println("按按鈕以開始使用");
-      while(Serial.available()){
-        Serial.read();
+      if(digitalRead(BUTTON_PIN)){
+        buttonState = 1;
       } 
-      while(!Serial.available()){}                    //未按按鈕不會動            
-      buttonStatei=Serial.read();
       delay(5);
       Serial.println("按下按鈕");
       Serial.println("鎖住連結功能...");
       apicontroller.lockUserLink();
       useState = 1;
-      //digitalWrite(LED_PIN, HIGH);   //LED就亮了 
+      digitalWrite(LED_PIN, HIGH);   //LED就亮了 
     }
   }      
   while(useState==1){
@@ -226,16 +220,13 @@ void loop() {
       Serial.println("垃圾掉進桶子");
       Serial.println("輸入0或繼續放垃圾");
    }
-    if(Serial.available()){
-      buttonStatei=Serial.read();
-    }
-    //timer.tick();
-    //timer.at(5, buttonStatereset);
-    if(buttonStatei=="0"){ 
+
+    if(digitalRead(BUTTON_PIN)){ 
+      buttonState = 1;
+      digitalWrite(LED_PIN, LOW);
       useState = 0;
       Serial.println("解鎖連接功能");
       apicontroller.unlockUserLink(); 
-      //timer.cancel();
       Serial.println("結束使用");
       Serial.println("");
       Serial.println("");
